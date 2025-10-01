@@ -121,7 +121,45 @@ def depth_first_search(time_map, start, end):
         path (list): The final path found by the search algorithm
     """
 
-    pass
+    # pseudocode:
+    #Start at the source node.
+        # Mark it as visited.
+        # Put it on a stack.
+    # While the stack isn’t empty:
+        # Remove the top node from the stack.
+        # “Visit” it (process it or record it).
+        # Look at all of its neighbors.
+        # For each neighbor that hasn’t been visited yet:
+            # Mark it visited.
+            # Put it on the top of the stack.
+    # Repeat until either:
+        # The goal node is found, or
+        # There are no more nodes left.
+
+    if start == end:
+        return [start], [start]
+
+    stack = [start]
+    visited_set = {start}
+    parents = {start: None}
+    visited_order = []
+
+    while stack:
+        parent = stack.pop()
+        visited_order.append(parent)
+
+        if parent == end:
+            path = reconstruct_path(parents, start, end)
+            return visited_order, path
+
+        for neighbor in expand(parent, time_map):
+            if neighbor not in visited_set:
+                visited_set.add(neighbor)
+                parents[neighbor] = parent
+                stack.append(neighbor)
+    #no path found
+    return visited_order, []
+    
 
 # TO DO: Implement Greedy Best-first Search.
 
