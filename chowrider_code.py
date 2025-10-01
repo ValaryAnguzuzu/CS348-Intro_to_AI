@@ -188,7 +188,49 @@ def best_first_search(dis_map, time_map, start, end):
         path (list): The final path found by the search algorithm
     """
 
-    pass
+    # heuristic-only search using h(n) = straightline dist from start to goal
+    if start == end:
+        return [start], [start]
+
+    visited_order = []
+    parents = {start: None}
+    visited_set = set()
+    pq = []
+    tie_order = 0
+
+    h_start = dis_map[start][end] # heuristic of start
+    heapq.heappush(pq, (h_start, tie_order, start))
+    tie_order += 1
+
+
+    while pq:
+        h, _, parent = heapq.heappop(pq)
+
+        if parent in visited_set:
+            continue
+
+        visited_set.add(parent)
+        visited_order.append(parent)
+
+        if parent == end: #we popped the goal
+            path = reconstruct_path(parents, start, end)
+            return visited_order, path
+
+        #not yet found goal, expand neighbors
+        for neighbor in expand(parent, time_map):
+            if neighbor not in visited_set:
+                #record oarent for path reconstruction
+                parents[neighbor] = parent
+
+                #compute heuristic for neighbor
+                h_neighbor = dis_map[neighbor][end]
+                #push neighbor into pq with (h, tie_order, neighbor)
+                heapq.heappush(pq, (h_neighbor, tie_order, neighbor))
+                tie_order += 1
+
+        #no path
+    return visited_order, []
+        
 
 # TO DO: Implement A* Search.
 
