@@ -27,8 +27,8 @@ def reconstruct_path(parents, start, goal):
         if cur == start:
             break
         cur = parents.get(cur)
-        path.reverse()
-        return path
+    path.reverse()
+    return path
 
 
 # TO DO: Implement Breadth-first Search.
@@ -55,7 +55,45 @@ def breadth_first_search(time_map, start, end):
         visited (list): A list of visited nodes in the order in which they were visited
         path (list): The final path found by the search algorithm
     """
+    #pseudocode:
+    # start at the source node.
+        # Mark it as visited
+        # Put it in a queue
+    # While the queue isn’t empty:
+        # Remove the first node from the queue.
+        # “Visit” it (process it or record it).
+        # Look at all of its neighbors.
+        # For each neighbor that hasn’t been visited yet:
+            # Mark it visited.
+            # Put it at the back of the queue.
+        # Repeat until either:
+        # The goal node is found, or
+        # There are no more nodes left.
+    if start == end:
+        return [start], [start]
 
+    queue = deque([start])
+    visited_set = {start}
+    parents = {start: None} # map child to parent for path reconstruction
+    visited_order = [] #list of nodes in the order in which they were expanded
+
+    while queue:
+        parent = queue.popleft()
+        visited_order.append(parent)
+
+        if parent == end: # goal found
+            path = reconstruct_path(parents, start, end)
+            return visited_order, path
+
+        #we havent seen goal yet, so expand neighbors
+        for neighbor in expand(parent, time_map):
+            if neighbor not in visited_set:
+                visited_set.add(neighbor)
+                parents[neighbor] = parent
+                queue.append(neighbor)
+
+    # no path found
+    return visited_order, []
     
 
 # TO DO: Implement Depth-first Search.
