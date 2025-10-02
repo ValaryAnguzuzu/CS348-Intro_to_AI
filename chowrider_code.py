@@ -263,4 +263,54 @@ def a_star_search(dis_map, time_map, start, end):
         path (list): The final path found by the search algorithm
     """
 
-    pass
+    # A* keeps track of best cost to reach node so far + estimated future cost to get to goal
+    # we will exoand the ide with the lowest f(n) = g(n) -> cost from start to n + h(n) -> estimated cost from n to goal
+    if start == end:
+        return [start], [start]
+
+    pq = []
+    tie_order = 0
+    parents = {start: None}
+    visited_order = []
+    best_g = {start: 0} # best known cost so far
+
+    #compute f(n) for start = g(start) + h(start) = 0 + heuristic
+    h_start = dis_map[start][end]
+    f_start = h_start # best cost so far (g(n)) at start is 0
+    heapq.heappush(pq, (f_start, 0, tie_order, start))
+    tie_order += 1
+
+    while pq:
+        # pop node with smallest f(n)=g(n) + h(n)
+        f, g, _, parent = heapq.heappop(pq)
+
+        # we want to skip if this entry is stale(g isnt the current best)
+        if g != best_g.get(parent, float('inf')):
+            continue
+        
+        visited_order.append(parent)
+
+        #found goal? reconstruct path
+        if parent == end:
+            path = reconstruct_path(parents, start, end)
+            return visited_order, path
+
+        for neighbor in expand(parent, time_map):
+            #commpute new cost so far if we go through parent
+            g_new = g + time_map[parent][neighbor]
+
+            #update best_g if this path is cheaper than any seen before
+            if g_new < best_g.get(neighbor, float('inf')):
+                best_g[neighbor] = g_new
+
+                parents[neighbor] = parent
+
+                # compute new_f = g_new + h
+                f_new = g_new + dis_map[neighbor][end]
+
+                heapq.heappush(pq, (f_new, g_new, tie_order, neighbor))
+                tie_order += 1
+
+    #no path
+    return visited_order, []
+            
