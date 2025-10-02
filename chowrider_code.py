@@ -24,8 +24,8 @@ def reconstruct_path(parents, start, goal):
     cur = goal
     while cur:
         path.append(cur)
-        if cur == start:
-            break
+        # if cur == start:
+        #     break
         cur = parents.get(cur)
     path.reverse()
     return path
@@ -140,21 +140,27 @@ def depth_first_search(time_map, start, end):
         return [start], [start]
 
     stack = [start]
-    visited_set = {start}
+    visited_set = set()
     parents = {start: None}
     visited_order = []
 
     while stack:
         parent = stack.pop()
+        #print(f"\nPopped: {parent} | stack now: {stack}")
+        if parent in visited_set:
+            continue
+        visited_set.add(parent)
         visited_order.append(parent)
 
         if parent == end:
             path = reconstruct_path(parents, start, end)
             return visited_order, path
+        all_neighbors = expand(parent, time_map)
+        #print(f"Neighbors of {parent}: {all_neighbors}")
 
-        for neighbor in expand(parent, time_map):
+        for neighbor in all_neighbors:
             if neighbor not in visited_set:
-                visited_set.add(neighbor)
+                #visited_set.add(neighbor)
                 parents[neighbor] = parent
                 stack.append(neighbor)
     #no path found
