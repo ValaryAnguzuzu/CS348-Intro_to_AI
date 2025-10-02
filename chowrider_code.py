@@ -214,24 +214,29 @@ def best_first_search(dis_map, time_map, start, end):
 
         if parent in visited_set:
             continue
+        
+        print(f"\nPopped: {parent} (h={h})")
+        print(f"Visited so far: {visited_order}")
 
         visited_set.add(parent)
         visited_order.append(parent)
 
         if parent == end: #we popped the goal
             path = reconstruct_path(parents, start, end)
+            print(f"GOAL found! Path: {path}")
             return visited_order, path
 
         #not yet found goal, expand neighbors
         for neighbor in expand(parent, time_map):
             if neighbor not in visited_set:
-                #record oarent for path reconstruction
+                #record parent for path reconstruction
                 parents[neighbor] = parent
 
                 #compute heuristic for neighbor
                 h_neighbor = dis_map[neighbor][end]
                 #push neighbor into pq with (h, tie_order, neighbor)
                 heapq.heappush(pq, (h_neighbor, tie_order, neighbor))
+                print(f"--> pushed {neighbor} with h={h_neighbor}, tie_order ={tie_order}, parent={parent}")
                 tie_order += 1
 
         #no path
