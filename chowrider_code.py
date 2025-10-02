@@ -201,7 +201,8 @@ def best_first_search(dis_map, time_map, start, end):
     visited_order = []
     parents = {start: None}
     visited_set = set()
-    pq = []
+    pq = [] # pq entries carry the predecessor so we can set parent on pop
+
     tie_order = 0
 
     h_start = dis_map[start][end] # heuristic of start
@@ -210,20 +211,22 @@ def best_first_search(dis_map, time_map, start, end):
 
 
     while pq:
-        h, _, parent = heapq.heappop(pq)
+        h, _, parent, pred = heapq.heappop(pq)
 
         if parent in visited_set:
             continue
+        if parent not in parents:
+            parents[parent] = pred
         
-        print(f"\nPopped: {parent} (h={h})")
-        print(f"Visited so far: {visited_order}")
+        #print(f"\nPopped: {parent} (h={h})")
+        #print(f"Visited so far: {visited_order}")
 
         visited_set.add(parent)
         visited_order.append(parent)
 
         if parent == end: #we popped the goal
             path = reconstruct_path(parents, start, end)
-            print(f"GOAL found! Path: {path}")
+            #print(f"GOAL found! Path: {path}")
             return visited_order, path
 
         #not yet found goal, expand neighbors
@@ -236,7 +239,7 @@ def best_first_search(dis_map, time_map, start, end):
                 h_neighbor = dis_map[neighbor][end]
                 #push neighbor into pq with (h, tie_order, neighbor)
                 heapq.heappush(pq, (h_neighbor, tie_order, neighbor))
-                print(f"--> pushed {neighbor} with h={h_neighbor}, tie_order ={tie_order}, parent={parent}")
+                #print(f"--> pushed {neighbor} with h={h_neighbor}, tie_order ={tie_order}, parent={parent}")
                 tie_order += 1
 
         #no path
