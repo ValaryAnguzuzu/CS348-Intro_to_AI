@@ -193,59 +193,34 @@ def best_first_search(dis_map, time_map, start, end):
         visited (list): A list of visited nodes in the order in which they were visited
         path (list): The final path found by the search algorithm
     """
-
-    # heuristic-only search using h(n) = straightline dist from start to goal
     if start == end:
         return [start], [start]
 
-    visited_order = []
-    parents = {start: None}
+    visited = []
     visited_set = set()
-    pq = [] # pq entries carry the predecessor so we can set parent on pop
 
-    tie_order = 0
+    # heap entries are (h, node, path_so_far)
+    heap = [(dis_map[start][end], start, [start])]
 
-    h_start = dis_map[start][end] # heuristic of start
-    heapq.heappush(pq, (h_start, tie_order, start))
-    tie_order += 1
+    while heap:
+        _, node, path = heapq.heappop(heap)
 
-
-    while pq:
-        h, _, parent, pred = heapq.heappop(pq)
-
-        if parent in visited_set:
+        if node in visited_set:
             continue
-        if parent not in parents:
-            parents[parent] = pred
-        
-        #print(f"\nPopped: {parent} (h={h})")
-        #print(f"Visited so far: {visited_order}")
 
-        visited_set.add(parent)
-        visited_order.append(parent)
+        visited_set.add(node)
+        visited.append(node)
 
-        if parent == end: #we popped the goal
-            path = reconstruct_path(parents, start, end)
-            #print(f"GOAL found! Path: {path}")
-            return visited_order, path
+        if node == end:
+            return visited, path
 
-        #not yet found goal, expand neighbors
-        for neighbor in expand(parent, time_map):
+        for neighbor in expand(node, time_map):
             if neighbor not in visited_set:
-                #record parent for path reconstruction
-                parents[neighbor] = parent
+                h = dis_map[neighbor][end]
+                heapq.heappush(heap, (h, neighbor, path + [neighbor]))
 
-                #compute heuristic for neighbor
-                h_neighbor = dis_map[neighbor][end]
-                #push neighbor into pq with (h, tie_order, neighbor)
-                heapq.heappush(pq, (h_neighbor, tie_order, neighbor))
-                #print(f"--> pushed {neighbor} with h={h_neighbor}, tie_order ={tie_order}, parent={parent}")
-                tie_order += 1
-
-        #no path
-    return visited_order, []
+    return visited, []
         
-
 # TO DO: Implement A* Search.
 
 # approach: (cost-so-far + heuristic)
