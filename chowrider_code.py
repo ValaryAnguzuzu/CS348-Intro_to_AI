@@ -220,7 +220,7 @@ def best_first_search(dis_map, time_map, start, end):
                 heapq.heappush(heap, (h, neighbor, path + [neighbor]))
 
     return visited, []
-        
+    
 # TO DO: Implement A* Search.
 
 # approach: (cost-so-far + heuristic)

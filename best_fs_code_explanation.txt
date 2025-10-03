@@ -1,0 +1,23 @@
+Comparison of the Two Implementations of Greedy Best-First Search
+
+In my code, I have two versions of Greedy Best-First Search:
+
+1. Uncommented version (working):
+   - The priority queue (heap) stores (h, node, path_so_far).
+   - Each time a neighbor is added, its full path is built by extending the current path: path + [neighbor].
+   - Because the path is carried along in the heap, the algorithm never needs to reconstruct the path at the end.
+   - As soon as the goal is popped, the correct path is already available.
+
+2. Commented version (not working):
+   - The heap only stored (h, tie_order, node), and I tried to store parent-child relationships in a dictionary parents.
+   - At the end, I called reconstruct_path(parents, start, goal) to rebuild the path.
+   - The bug is that I updated parents[neighbor] = parent at the time of pushing into the heap.
+     - If a neighbor was added multiple times (before being popped), its parent entry could be overwritten incorrectly.
+     - This meant the parents dictionary sometimes had missing or wrong links, so reconstruct_path() failed or returned the wrong path.
+
+Main difference:
+- The working version keeps paths explicitly inside the heap and never needs reconstruction.
+- The broken version tried to rebuild the path later using parent pointers, but fails because parent tracking was not done consistently.
+
+Conclusion:
+The working code succeeds because path information is carried forward directly. The non-working code fails because the parent dictionary is not always correct when multiple pushes of the same neighbor happen. The fix is to record parents only when a node is actually popped, not when it is pushed.
